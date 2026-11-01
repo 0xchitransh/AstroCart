@@ -2,7 +2,7 @@ import { PackageCheck, Ruler, ShieldCheck, Users } from 'lucide-react';
 
 /** Every item reflects the actual ordering flow and the published terms. */
 const BENEFITS = [
-  { icon: Users, title: 'Men’s & Ladies’ Designs', text: 'Choose the fit that suits you' },
+  { icon: Users, title: 'Men’s & Women’s Designs', text: 'Choose the fit that suits you' },
   { icon: Ruler, title: 'Sizes 4 to 40', text: 'Select your Indian ring size' },
   { icon: ShieldCheck, title: 'Secure Checkout', text: 'Payments handled by Razorpay' },
   { icon: PackageCheck, title: 'Inspect on Delivery', text: 'Report wrong or damaged items promptly' },

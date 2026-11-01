@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useDeferredValue, useMemo, useState } from 'react';
 import { Search, X } from 'lucide-react';
-import { PRODUCTS, formatPrice } from '@/data/products';
+import { PRODUCTS, formatPrice, metaLine } from '@/data/products';
 import { useStore } from '@/components/store/StoreProvider';
 import { Overlay } from '@/components/ui/Overlay';
 
@@ -15,9 +15,12 @@ export function SearchOverlay() {
   const results = useMemo(() => {
     const q = deferred.trim().toLowerCase();
     if (!q) return PRODUCTS;
-    return PRODUCTS.filter((p) =>
-      [p.name, p.stone, p.stoneLocal, p.planet, p.planetLocal, p.desc].some((field) => field.toLowerCase().includes(q)),
-    );
+    // Every query word must start a word in the product text, so "men" does not also match "women's".
+    const tokens = q.split(/\s+/);
+    return PRODUCTS.filter((p) => {
+      const hay = ` ${[p.name, p.stone, p.stoneLocal, p.planet, p.planetLocal, p.desc].filter(Boolean).join(' ')}`.toLowerCase();
+      return tokens.every((t) => hay.includes(` ${t}`));
+    });
   }, [deferred]);
 
   return (
@@ -28,7 +31,7 @@ export function SearchOverlay() {
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by stone, planet or ring name"
+          placeholder="Search by stone, planet, men's or women's"
           aria-label="Search products"
           data-autofocus
         />
@@ -51,9 +54,7 @@ export function SearchOverlay() {
                   </span>
                   <span className="search__text">
                     <strong>{p.name}</strong>
-                    <small>
-                      {p.stone} | {p.planet} ({p.planetLocal})
-                    </small>
+                    <small>{metaLine(p)}</small>
                   </span>
                   <span className="search__price">{formatPrice(p.price)}</span>
                 </button>

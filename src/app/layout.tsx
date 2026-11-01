@@ -19,7 +19,7 @@ const sans = Manrope({
 
 export const metadata: Metadata = {
   title: `${BRAND} | Divine Panchdhatu Rings & Astrological Gemstones`,
-  description: `${BRAND} offers handcrafted Panchdhatu rings set with Yellow Sapphire, Blue Sapphire, Emerald and Ruby, in men's and ladies' designs and Indian sizes 4 to 40.`,
+  description: `${BRAND} offers handcrafted Panchdhatu rings set with Ruby, Yellow Sapphire, Blue Sapphire, Emerald, Coral, Pearl, Diamond and other gemstones, in men's and women's designs and Indian sizes 4 to 40.`,
   openGraph: {
     title: `${BRAND} | Divine Panchdhatu Rings`,
     description: 'Handcrafted Panchdhatu rings set with astrology-associated gemstones.',

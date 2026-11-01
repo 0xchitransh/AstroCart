@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { Heart, ShoppingBag, X } from 'lucide-react';
-import { formatPrice } from '@/data/products';
+import { categoryLabel, formatPrice, metaLine } from '@/data/products';
 import { useStore } from '@/components/store/StoreProvider';
 import { Overlay } from '@/components/ui/Overlay';
 import { useRetained } from '@/components/ui/useRetained';
@@ -29,16 +29,14 @@ export function QuickView() {
             <Image src={product.image} alt={product.name} fill sizes="(max-width: 800px) 90vw, 420px" />
           </div>
           <div className="quickview__info">
-            <p className="eyebrow">{product.stoneLocal}</p>
+            <p className="eyebrow">{product.stoneLocal ?? `${categoryLabel(product.category)} design`}</p>
             <h2>{product.name}</h2>
-            <p className="card__meta">
-              {product.stone} | {product.planet} ({product.planetLocal})
-            </p>
+            <p className="card__meta">{metaLine(product)}</p>
             <p className="quickview__price">{formatPrice(product.price)}</p>
             <p className="quickview__desc">{product.desc}</p>
             <ul className="quickview__list">
-              <li>Gemstone set in a Panchdhatu band</li>
-              <li>Men&apos;s and ladies&apos; designs</li>
+              <li>{product.kind === 'band' ? 'Panchdhatu band, no stone' : 'Gemstone set in a Panchdhatu band'}</li>
+              <li>{categoryLabel(product.category)} design</li>
               <li>Indian sizes 4 to 40, chosen at the next step</li>
             </ul>
             <div className="quickview__actions">

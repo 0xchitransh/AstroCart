@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { ArrowRight, Eye, Heart } from 'lucide-react';
-import { PRODUCTS, formatPrice, type Product } from '@/data/products';
+import { BAND_SLUG, CATEGORIES, GEMS, PRODUCTS, formatPrice, metaLine, type Product } from '@/data/products';
 import { useStore } from '@/components/store/StoreProvider';
 import { Reveal } from '@/components/ui/Reveal';
 
@@ -15,7 +15,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
       <div className="card__media">
         <Image
           src={product.image}
-          alt={`${product.name} with ${product.stone.toLowerCase()} set in a Panchdhatu band`}
+          alt={product.kind === 'band' ? `${product.name}, Panchdhatu` : `${product.name} with ${product.stone.toLowerCase()} set in a Panchdhatu band`}
           fill
           sizes="(max-width: 700px) 50vw, (max-width: 1100px) 50vw, 25vw"
         />
@@ -35,10 +35,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
       <div className="card__body">
         <div className="card__text">
           <h3>{product.name}</h3>
-          <p className="card__meta">
-            {product.stone} <span aria-hidden="true">|</span>
-            <span className="sr-only">,</span> {product.planet} ({product.planetLocal})
-          </p>
+          <p className="card__meta">{metaLine(product)}</p>
         </div>
         <p className="card__price">{formatPrice(product.price)}</p>
         <button
@@ -56,20 +53,21 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
 }
 
 export function Collection() {
-  const { filter, setFilter, wishlist } = useStore();
+  const { filter, setFilter, category, setCategory, wishlist } = useStore();
 
   const chips = [
-    { id: 'all', label: 'All' },
-    ...PRODUCTS.map((p) => ({ id: p.id, label: p.stone })),
+    { id: 'all', label: 'All stones' },
+    ...GEMS.map((g) => ({ id: g.slug, label: g.stone })),
+    { id: BAND_SLUG, label: 'Plain Band' },
     { id: 'saved', label: `Saved${wishlist.length ? ` (${wishlist.length})` : ''}` },
   ];
 
-  const visible =
-    filter === 'all'
-      ? PRODUCTS
-      : filter === 'saved'
-        ? PRODUCTS.filter((p) => wishlist.includes(p.id))
-        : PRODUCTS.filter((p) => p.id === filter);
+  const matches = (p: Product) =>
+    filter === 'all' ? true : filter === 'saved' ? wishlist.includes(p.id) : p.slug === filter;
+
+  const groups = CATEGORIES.filter((c) => category === 'all' || category === c.id)
+    .map((c) => ({ ...c, items: PRODUCTS.filter((p) => p.category === c.id && matches(p)) }))
+    .filter((g) => g.items.length > 0);
 
   return (
     <section id="collection" className="section collection" aria-labelledby="collection-title">
@@ -81,14 +79,36 @@ export function Collection() {
               Shop by Gemstone
             </h2>
             <span className="ornament" aria-hidden="true" />
-            <button type="button" className="link-arrow section-head__aside" onClick={() => setFilter('all')}>
+            <button
+              type="button"
+              className="link-arrow section-head__aside"
+              onClick={() => {
+                setFilter('all');
+                setCategory('all');
+              }}
+            >
               View All Products <ArrowRight size={15} strokeWidth={1.5} />
             </button>
           </header>
         </Reveal>
 
         <Reveal delay={80}>
-          <div className="chips" role="group" aria-label="Filter products">
+          <div className="segmented" role="group" aria-label="Ring design">
+            {[{ id: 'all' as const, label: 'All designs' }, ...CATEGORIES.map((c) => ({ id: c.id, label: c.label }))].map(
+              (c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  className={`segmented__btn ${category === c.id ? 'is-active' : ''}`}
+                  aria-pressed={category === c.id}
+                  onClick={() => setCategory(c.id)}
+                >
+                  {c.label}
+                </button>
+              ),
+            )}
+          </div>
+          <div className="chips" role="group" aria-label="Filter by stone">
             {chips.map((chip) => (
               <button
                 key={chip.id}
@@ -103,18 +123,25 @@ export function Collection() {
           </div>
         </Reveal>
 
-        <div className="grid" aria-live="polite">
-          {visible.length === 0 ? (
+        <div aria-live="polite">
+          {groups.length === 0 ? (
             <p className="empty">
               {filter === 'saved'
                 ? 'Nothing saved yet. Tap the heart on any ring to keep it here.'
                 : 'No products match this filter.'}
             </p>
           ) : (
-            visible.map((product, i) => (
-              <Reveal key={product.id} delay={i * 90}>
-                <ProductCard product={product} index={i} />
-              </Reveal>
+            groups.map((g) => (
+              <div key={g.id} className="collection__group" id={`collection-${g.id}`}>
+                <h3 className="collection__group-title">{g.title}</h3>
+                <div className="grid">
+                  {g.items.map((product, i) => (
+                    <Reveal key={product.id} delay={(i % 4) * 90}>
+                      <ProductCard product={product} index={i} />
+                    </Reveal>
+                  ))}
+                </div>
+              </div>
             ))
           )}
         </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { BRAND, CONTACT } from '@/data/site';
-import { PRODUCTS } from '@/data/products';
+import { BAND_SLUG, CATEGORIES, GEMS } from '@/data/products';
 import { useStore } from '@/components/store/StoreProvider';
 
 export function Footer() {
@@ -20,7 +20,7 @@ export function Footer() {
           <span className="nav__brand nav__brand--light">{BRAND}</span>
           <p>
             Panchdhatu rings set with astrology-associated gemstones, handcrafted in men&apos;s and
-            ladies&apos; designs.
+            women&apos;s designs.
           </p>
           {socials.length > 0 && (
             <ul className="footer__social" aria-label="Social links">
@@ -38,13 +38,25 @@ export function Footer() {
         <nav aria-label="Collections">
           <h2 className="footer__h">Collections</h2>
           <ul>
-            {PRODUCTS.map((p) => (
-              <li key={p.id}>
-                <button type="button" onClick={() => showCollection(p.id)}>
-                  {p.stone} Ring
+            {CATEGORIES.map((c) => (
+              <li key={c.id}>
+                <button type="button" onClick={() => showCollection('all', c.id)}>
+                  {c.title}
                 </button>
               </li>
             ))}
+            {GEMS.map((g) => (
+              <li key={g.slug}>
+                <button type="button" onClick={() => showCollection(g.slug)}>
+                  {g.stone} Ring
+                </button>
+              </li>
+            ))}
+            <li>
+              <button type="button" onClick={() => showCollection(BAND_SLUG)}>
+                Plain Band
+              </button>
+            </li>
             <li>
               <button type="button" onClick={() => showCollection('all')}>
                 View all

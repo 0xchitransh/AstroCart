@@ -3,22 +3,24 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { PRODUCTS, formatPrice } from '@/data/products';
+import { CATEGORIES, GEMS, formatPrice, gemRingPrice, productFor, type Category } from '@/data/products';
 import { useStore } from '@/components/store/StoreProvider';
 import { Reveal } from '@/components/ui/Reveal';
 
 export function GemstoneGuide() {
   const { showCollection, openOverlay } = useStore();
-  const [activeId, setActiveId] = useState(PRODUCTS[0].id);
-  const active = PRODUCTS.find((p) => p.id === activeId) ?? PRODUCTS[0];
+  const [activeId, setActiveId] = useState(GEMS[0].slug);
+  const [cat, setCat] = useState<Category>('mens');
+  const active = GEMS.find((g) => g.slug === activeId) ?? GEMS[0];
+  const ring = productFor(active.slug, cat);
 
   const onTabKey = (e: React.KeyboardEvent, index: number) => {
     if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft' && e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
     e.preventDefault();
     const dir = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : -1;
-    const next = PRODUCTS[(index + dir + PRODUCTS.length) % PRODUCTS.length];
-    setActiveId(next.id);
-    document.getElementById(`gem-tab-${next.id}`)?.focus();
+    const next = GEMS[(index + dir + GEMS.length) % GEMS.length];
+    setActiveId(next.slug);
+    document.getElementById(`gem-tab-${next.slug}`)?.focus();
   };
 
   return (
@@ -40,69 +42,86 @@ export function GemstoneGuide() {
         <Reveal delay={100}>
           <div className="guide__layout">
             <div className="guide__tabs" role="tablist" aria-label="Gemstones" aria-orientation="vertical">
-              {PRODUCTS.map((p, i) => (
+              {GEMS.map((p, i) => (
                 <button
-                  key={p.id}
-                  id={`gem-tab-${p.id}`}
+                  key={p.slug}
+                  id={`gem-tab-${p.slug}`}
                   type="button"
                   role="tab"
-                  aria-selected={p.id === activeId}
+                  aria-selected={p.slug === activeId}
                   aria-controls="gem-panel"
-                  tabIndex={p.id === activeId ? 0 : -1}
-                  className={`guide__tab ${p.id === activeId ? 'is-active' : ''}`}
-                  onClick={() => setActiveId(p.id)}
+                  tabIndex={p.slug === activeId ? 0 : -1}
+                  className={`guide__tab ${p.slug === activeId ? 'is-active' : ''}`}
+                  onClick={() => setActiveId(p.slug)}
                   onKeyDown={(e) => onTabKey(e, i)}
                 >
                   <span className="guide__dot" style={{ background: p.tone }} aria-hidden="true" />
                   <span className="guide__tab-text">
                     <strong>{p.stone}</strong>
-                    <small>{p.stoneLocal}</small>
+                    {p.stoneLocal && <small>{p.stoneLocal}</small>}
                   </span>
                 </button>
               ))}
             </div>
 
-            <div id="gem-panel" role="tabpanel" aria-labelledby={`gem-tab-${active.id}`} className="guide__panel" key={active.id}>
+            <div id="gem-panel" role="tabpanel" aria-labelledby={`gem-tab-${active.slug}`} className="guide__panel" key={active.slug}>
               <div className="guide__image">
                 <Image
-                  src={active.image}
-                  alt={`${active.name}`}
+                  src={ring?.image ?? ''}
+                  alt={ring?.name ?? active.stone}
                   fill
                   sizes="(max-width: 900px) 90vw, 40vw"
                 />
               </div>
               <div className="guide__detail">
-                <p className="eyebrow">{active.stoneLocal}</p>
+                {active.stoneLocal && <p className="eyebrow">{active.stoneLocal}</p>}
                 <h3>{active.stone}</h3>
+                <div className="segmented segmented--small" role="group" aria-label="Ring design">
+                  {CATEGORIES.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      className={`segmented__btn ${cat === c.id ? 'is-active' : ''}`}
+                      aria-pressed={cat === c.id}
+                      onClick={() => setCat(c.id)}
+                    >
+                      {c.label}
+                    </button>
+                  ))}
+                </div>
                 <dl className="guide__meta">
-                  <div>
-                    <dt>Traditionally linked planet</dt>
-                    <dd>
-                      {active.planet} ({active.planetLocal})
-                    </dd>
-                  </div>
+                  {active.planet && (
+                    <div>
+                      <dt>Traditionally linked planet</dt>
+                      <dd>
+                        {active.planet}
+                        {active.planetLocal && active.planetLocal !== active.planet ? ` (${active.planetLocal})` : ''}
+                      </dd>
+                    </div>
+                  )}
                   <div>
                     <dt>Set in</dt>
                     <dd>Panchdhatu band</dd>
                   </div>
                   <div>
                     <dt>Ring price</dt>
-                    <dd>{formatPrice(active.price)}</dd>
+                    <dd>{formatPrice(gemRingPrice(active))}</dd>
                   </div>
                 </dl>
                 <p className="guide__desc">{active.desc}</p>
                 <p className="fineprint">
-                  Associations follow Vedic tradition and are shared for information. They are a matter of
-                  belief, and no outcome is guaranteed.
+                  {active.planet
+                    ? 'Associations follow Vedic tradition and are shared for information. They are a matter of belief, and no outcome is guaranteed.'
+                    : 'Beliefs about gemstones are a matter of personal belief, and no outcome is guaranteed.'}
                 </p>
                 <div className="guide__actions">
-                  <button type="button" className="btn btn--dark" onClick={() => showCollection(active.id)}>
+                  <button type="button" className="btn btn--dark" onClick={() => showCollection(active.slug, cat)}>
                     Explore in collection <ArrowRight size={16} strokeWidth={1.75} />
                   </button>
                   <button
                     type="button"
                     className="btn btn--outline-dark"
-                    onClick={() => openOverlay('quickview', { product: active })}
+                    onClick={() => ring && openOverlay('quickview', { product: ring })}
                   >
                     Quick view
                   </button>

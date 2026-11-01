@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { ShoppingBag, X } from 'lucide-react';
-import { formatPrice } from '@/data/products';
+import { categoryLabel, formatPrice } from '@/data/products';
 import { useStore } from '@/components/store/StoreProvider';
 import { Overlay } from '@/components/ui/Overlay';
 
@@ -37,7 +37,7 @@ export function CartDrawer() {
                 <div className="cart__info">
                   <h3>{item.name}</h3>
                   <p>
-                    {item.design === 'mens' ? "Men's" : "Ladies'"} design · Size {item.size}
+                    {categoryLabel(item.category)} design · Size {item.size}
                   </p>
                   <p className="cart__price">{formatPrice(item.price)}</p>
                   <button type="button" className="text-btn" onClick={() => removeFromCart(item.cartId)}>

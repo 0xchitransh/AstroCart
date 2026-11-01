@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { ArrowRight, Menu, Search, ShoppingBag, X } from 'lucide-react';
 import { BRAND, NAV_LINKS } from '@/data/site';
-import { PRODUCTS, formatPrice } from '@/data/products';
+import { BAND_PRICE, BAND_SLUG, CATEGORIES, GEMS, formatPrice, gemRingPrice, productFor } from '@/data/products';
 import { useStore } from '@/components/store/StoreProvider';
 import { Overlay } from '@/components/ui/Overlay';
 
@@ -70,27 +70,67 @@ export function Navbar() {
                   </a>
                   <div className={`mega ${mega ? 'is-open' : ''}`} inert={!mega}>
                     <div className="mega__grid">
-                      {PRODUCTS.map((p) => (
-                        <button
-                          key={p.id}
-                          type="button"
-                          className="mega__item"
-                          onClick={() => {
-                            setMega(false);
-                            showCollection(p.id);
-                          }}
-                        >
-                          <span className="mega__thumb">
-                            <Image src={p.image} alt="" fill sizes="72px" />
-                          </span>
-                          <span className="mega__text">
-                            <span className="mega__name">{p.stone}</span>
-                            <span className="mega__meta">
-                              {p.planet} ({p.planetLocal}) · {formatPrice(p.price)}
+                      {CATEGORIES.map((c) => {
+                        const cover = productFor('ruby', c.id);
+                        return (
+                          <button
+                            key={c.id}
+                            type="button"
+                            className="mega__item mega__item--cat"
+                            onClick={() => {
+                              setMega(false);
+                              showCollection('all', c.id);
+                            }}
+                          >
+                            <span className="mega__thumb">
+                              {cover && <Image src={cover.image} alt="" fill sizes="72px" />}
                             </span>
-                          </span>
-                        </button>
-                      ))}
+                            <span className="mega__text">
+                              <span className="mega__name">{c.title}</span>
+                              <span className="mega__meta">Shop all designs</span>
+                            </span>
+                          </button>
+                        );
+                      })}
+                      {GEMS.map((g) => {
+                        const p = productFor(g.slug, 'mens');
+                        return (
+                          <button
+                            key={g.slug}
+                            type="button"
+                            className="mega__item"
+                            onClick={() => {
+                              setMega(false);
+                              showCollection(g.slug);
+                            }}
+                          >
+                            <span className="mega__thumb">{p && <Image src={p.image} alt="" fill sizes="72px" />}</span>
+                            <span className="mega__text">
+                              <span className="mega__name">{g.stone}</span>
+                              <span className="mega__meta">
+                                {g.planet ? `${g.planet} · ` : ''}
+                                {formatPrice(gemRingPrice(g))}
+                              </span>
+                            </span>
+                          </button>
+                        );
+                      })}
+                      <button
+                        type="button"
+                        className="mega__item"
+                        onClick={() => {
+                          setMega(false);
+                          showCollection(BAND_SLUG);
+                        }}
+                      >
+                        <span className="mega__thumb">
+                          <Image src="/assets/mens/plain-band.jpg" alt="" fill sizes="72px" />
+                        </span>
+                        <span className="mega__text">
+                          <span className="mega__name">Plain Band</span>
+                          <span className="mega__meta">{formatPrice(BAND_PRICE)}</span>
+                        </span>
+                      </button>
                       <button
                         type="button"
                         className="mega__all"

@@ -3,8 +3,8 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import { formatPrice, type Product } from '@/data/products';
-import { useStore, type RingDesign } from '@/components/store/StoreProvider';
+import { categoryLabel, formatPrice, type Product } from '@/data/products';
+import { useStore } from '@/components/store/StoreProvider';
 import { Overlay } from '@/components/ui/Overlay';
 import { useRetained } from '@/components/ui/useRetained';
 
@@ -28,17 +28,16 @@ function ConfiguratorForm({
 }: {
   product: Product;
   onClose: () => void;
-  onAdd: (product: Product, size: string, design: RingDesign) => void;
+  onAdd: (product: Product, size: string) => void;
 }) {
   const [size, setSize] = useState('14');
-  const [design, setDesign] = useState<RingDesign>('mens');
 
   return (
     <form
       className="modal__body"
       onSubmit={(e) => {
         e.preventDefault();
-        onAdd(product, size, design);
+        onAdd(product, size);
       }}
     >
       <button type="button" className="icon-btn modal__close" aria-label="Close" onClick={onClose}>
@@ -52,17 +51,11 @@ function ConfiguratorForm({
         </div>
         <div>
           <h3>{product.name}</h3>
+          <p className="config__design">{categoryLabel(product.category)} design</p>
           <p className="config__price">{formatPrice(product.price)}</p>
         </div>
       </div>
 
-      <div className="field">
-        <label htmlFor="ring-design">Ring Design</label>
-        <select id="ring-design" value={design} onChange={(e) => setDesign(e.target.value as RingDesign)} data-autofocus>
-          <option value="mens">Men&apos;s Design</option>
-          <option value="ladies">Ladies&apos; Design</option>
-        </select>
-      </div>
       <div className="field">
         <label htmlFor="ring-size">Indian Size (4–40)</label>
         <input
@@ -75,6 +68,7 @@ function ConfiguratorForm({
           value={size}
           onChange={(e) => setSize(e.target.value)}
           required
+          data-autofocus
         />
       </div>
 

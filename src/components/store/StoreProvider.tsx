@@ -11,13 +11,10 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from 'react';
-import type { Product } from '@/data/products';
-
-export type RingDesign = 'mens' | 'ladies';
+import type { Category, Product } from '@/data/products';
 
 export type CartItem = Product & {
   size: string;
-  design: RingDesign;
   cartId: string;
 };
 
@@ -32,13 +29,14 @@ export type OverlayType =
 
 type OverlayState = { type: OverlayType; product?: Product; section?: string } | null;
 
-/** 'all', 'saved', or a product id */
+/** 'all', 'saved', or a stone slug (e.g. 'ruby', 'plain-band') */
 export type CollectionFilter = string;
+export type CategoryFilter = 'all' | Category;
 
 type StoreValue = {
   cart: CartItem[];
   cartTotal: number;
-  addToCart: (product: Product, size: string, design: RingDesign) => void;
+  addToCart: (product: Product, size: string) => void;
   removeFromCart: (cartId: string) => void;
   clearCart: () => void;
 
@@ -51,8 +49,10 @@ type StoreValue = {
 
   filter: CollectionFilter;
   setFilter: (filter: CollectionFilter) => void;
-  /** Applies a collection filter and scrolls to the product grid. */
-  showCollection: (filter?: CollectionFilter) => void;
+  category: CategoryFilter;
+  setCategory: (category: CategoryFilter) => void;
+  /** Applies collection filters and scrolls to the product grid. */
+  showCollection: (filter?: CollectionFilter, category?: CategoryFilter) => void;
 
   toast: string | null;
   showToast: (message: string) => void;
@@ -120,6 +120,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // Server snapshot is empty, so hydration always matches; the saved list appears right after.
   const wishlist = useSyncExternalStore(subscribeWishlist, readWishlist, () => EMPTY_WISHLIST);
   const [filter, setFilter] = useState<CollectionFilter>('all');
+  const [category, setCategory] = useState<CategoryFilter>('all');
   const [toast, setToast] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const cartSeq = useRef(0);
@@ -138,10 +139,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     toastTimer.current = setTimeout(() => setToast(null), 2400);
   }, []);
 
-  const addToCart = useCallback((product: Product, size: string, design: RingDesign) => {
+  const addToCart = useCallback((product: Product, size: string) => {
     cartSeq.current += 1;
     const cartId = `${Date.now()}-${cartSeq.current}`;
-    setCart((prev) => [...prev, { ...product, size, design, cartId }]);
+    setCart((prev) => [...prev, { ...product, size, cartId }]);
     setOverlay({ type: 'cart' });
   }, []);
 
@@ -167,8 +168,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [showToast],
   );
 
-  const showCollection = useCallback((next: CollectionFilter = 'all') => {
+  const showCollection = useCallback((next: CollectionFilter = 'all', nextCategory: CategoryFilter = 'all') => {
     setFilter(next);
+    setCategory(nextCategory);
     setOverlay(null);
     // Wait a frame so the overlay releases the body scroll lock first.
     requestAnimationFrame(() => requestAnimationFrame(() => scrollToId('collection')));
@@ -190,6 +192,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       toggleWishlist,
       filter,
       setFilter,
+      category,
+      setCategory,
       showCollection,
       toast,
       showToast,
@@ -206,6 +210,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       wishlist,
       toggleWishlist,
       filter,
+      category,
       showCollection,
       toast,
       showToast,

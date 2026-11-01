@@ -59,7 +59,7 @@ export function Hero() {
           </div>
           <ul className="hero__chips hero-anim" style={{ ['--d' as string]: '0.65s' }}>
             <li>
-              <Users size={16} strokeWidth={1.5} /> Men&apos;s &amp; ladies&apos; designs
+              <Users size={16} strokeWidth={1.5} /> Men&apos;s &amp; women&apos;s designs
             </li>
             <li>
               <Ruler size={16} strokeWidth={1.5} /> Indian sizes 4–40

@@ -9,7 +9,7 @@ import { Reveal } from '@/components/ui/Reveal';
 const FACTS = [
   { label: 'Five metals', text: 'A traditional alloy of five metals, long used in Indian jewellery and sacred objects.' },
   { label: 'Handcrafted bands', text: 'Each gemstone is set in a Panchdhatu band, with engraved detailing.' },
-  { label: 'Made to fit', text: 'Men’s and ladies’ designs in Indian sizes 4 to 40.' },
+  { label: 'Made to fit', text: 'Men’s and women’s designs in Indian sizes 4 to 40.' },
 ];
 
 export function Panchdhatu() {
