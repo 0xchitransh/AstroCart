@@ -1,8 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { ArrowRight, Flower2, Gem, Hammer, Orbit, Ruler, Users } from 'lucide-react';
-import { Particles, ZodiacWheel } from '@/components/ui/Celestial';
+import { ArrowRight, Flower2, Gem, Hammer, Orbit } from 'lucide-react';
 import { useStore } from '@/components/store/StoreProvider';
 
 const HIGHLIGHTS = [
@@ -17,61 +16,77 @@ export function Hero() {
 
   return (
     <section id="home" className="hero" aria-labelledby="hero-title">
-      <div className="hero__bg" aria-hidden="true">
-        <div className="hero__vignette" />
-        <Particles />
-      </div>
-
       <div className="container hero__grid">
-        <div className="hero__top">
-          <p className="eyebrow eyebrow--gold hero-anim" style={{ ['--d' as string]: '0.1s' }}>
+        <div className="hero__copy">
+          <p className="eyebrow hero-anim" style={{ ['--d' as string]: '0.1s' }}>
             Astrology meets craftsmanship
           </p>
-          <h1 id="hero-title" className="hero__title hero-anim" style={{ ['--d' as string]: '0.25s' }}>
+          <h1 id="hero-title" className="hero__title hero-anim" style={{ ['--d' as string]: '0.22s' }}>
             Divine
             <br />
             Panchdhatu Rings
           </h1>
-        </div>
-
-        <div className="hero__visual hero-anim hero-anim--ring" style={{ ['--d' as string]: '0.35s' }}>
-          <ZodiacWheel className="hero__wheel" />
-          <div className="hero__glow" aria-hidden="true" />
-          <Image
-            src="/assets/ring_blue.jpg"
-            alt="Blue sapphire ring set in an engraved Panchdhatu band, resting on dark stone"
-            fill
-            priority
-            sizes="(max-width: 700px) 92vw, (max-width: 1100px) 50vw, 40vw"
-            className="hero__ring"
-          />
-        </div>
-
-        <div className="hero__bottom">
-          <p className="hero__lede hero-anim" style={{ ['--d' as string]: '0.45s' }}>
+          <p className="hero__lede hero-anim" style={{ ['--d' as string]: '0.34s' }}>
             Handcrafted with sacred Panchdhatu and authentic gemstones, our rings are designed to bring
             harmony, positivity and balance into your life.
           </p>
-          <div className="hero-anim" style={{ ['--d' as string]: '0.55s' }}>
-            <button type="button" className="btn btn--gold" onClick={() => showCollection('all')}>
+          <div className="hero__cta hero-anim" style={{ ['--d' as string]: '0.46s' }}>
+            <button type="button" className="btn btn--dark" onClick={() => showCollection('all')}>
               Explore Collection <ArrowRight size={16} strokeWidth={1.75} />
             </button>
+            <div className="hero__links">
+              <button type="button" className="link-arrow" onClick={() => showCollection('all', 'mens')}>
+                Shop Men&apos;s <ArrowRight size={15} strokeWidth={1.5} />
+              </button>
+              <button type="button" className="link-arrow" onClick={() => showCollection('all', 'womens')}>
+                Shop Women&apos;s <ArrowRight size={15} strokeWidth={1.5} />
+              </button>
+            </div>
           </div>
-          <ul className="hero__chips hero-anim" style={{ ['--d' as string]: '0.65s' }}>
-            <li>
-              <Users size={16} strokeWidth={1.5} /> Men&apos;s &amp; women&apos;s designs
-            </li>
-            <li>
-              <Ruler size={16} strokeWidth={1.5} /> Indian sizes 4–40
-            </li>
-          </ul>
+        </div>
+
+        <div className="hero__visual hero-anim hero-anim--ring" style={{ ['--d' as string]: '0.3s' }}>
+          <button
+            type="button"
+            className="hero__photo hero__photo--main"
+            onClick={() => showCollection('all', 'womens')}
+            aria-label="Shop women's Panchdhatu rings"
+          >
+            <Image
+              src="/assets/womens/blue-sapphire.jpg"
+              alt="Women's blue sapphire ring in a Panchdhatu band"
+              fill
+              priority
+              sizes="(max-width: 900px) 80vw, 40vw"
+            />
+            <span className="hero__tag">
+              Women&apos;s <ArrowRight size={13} strokeWidth={1.75} />
+            </span>
+          </button>
+          <button
+            type="button"
+            className="hero__photo hero__photo--inset"
+            onClick={() => showCollection('all', 'mens')}
+            aria-label="Shop men's Panchdhatu rings"
+          >
+            <Image
+              src="/assets/mens/ruby.jpg"
+              alt="Men's ruby ring in a Panchdhatu band"
+              fill
+              priority
+              sizes="(max-width: 900px) 40vw, 18vw"
+            />
+            <span className="hero__tag">
+              Men&apos;s <ArrowRight size={13} strokeWidth={1.75} />
+            </span>
+          </button>
         </div>
 
         <ul className="hero__highlights" aria-label="Brand highlights">
           {HIGHLIGHTS.map(({ icon: Icon, title, text }, i) => (
-            <li key={title} className="hero-anim" style={{ ['--d' as string]: `${0.5 + i * 0.1}s` }}>
+            <li key={title} className="hero-anim" style={{ ['--d' as string]: `${0.55 + i * 0.08}s` }}>
               <span className="hero__hl-icon">
-                <Icon size={22} strokeWidth={1.25} />
+                <Icon size={20} strokeWidth={1.25} />
               </span>
               <span>
                 <strong>{title}</strong>
